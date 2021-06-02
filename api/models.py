@@ -1,11 +1,10 @@
 import textwrap
 
-from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models.deletion import CASCADE
 from pytils.translit import slugify
 
-User = get_user_model()
+from api_auth.models import User
 
 
 class Category(models.Model):
@@ -17,8 +16,8 @@ class Category(models.Model):
         (MOVIES, 'Фильмы'),
         (MUSIC, 'Музыка'),
     ]
-    name = models.TextField(verbose_name="Категория",
-                            help_text="Выберите категорию",
+    name = models.TextField(verbose_name='Категория',
+                            help_text='Выберите категорию',
                             choices=CATEGORY_CHOICES,)
     slug = models.SlugField(max_length=100,
                             unique=True, blank=True,)
@@ -54,8 +53,8 @@ class Genre(models.Model):
         ),
     ]
 
-    name = models.TextField(verbose_name="Жанр",
-                            help_text="Выберите жанр",
+    name = models.TextField(verbose_name='Жанр',
+                            help_text='Выберите жанр',
                             choices=GENRE_CHOICES,)
     slug = models.SlugField(max_length=100,
                             unique=True, blank=True,)
@@ -74,43 +73,52 @@ class Title(models.Model):
     description = models.TextField()
     category = models.ForeignKey(Category, models.SET_NULL, blank=True,
                                  null=True,
-                                 related_name="title")
-    genre = models.ManyToManyField(Genre, related_name="title")
+                                 related_name='title')
+    genre = models.ManyToManyField(Genre, related_name='title')
     year = models.DecimalField(max_digits=4, decimal_places=0)
     # rating = models.ForeignKey(Rating, models.SET_NULL, blank=True,
     #                            null=True,
-    #                            related_name="title")
+    #                            related_name='title')
 
     def __str__(self):
         return textwrap.shorten(self.name, self.description, width=15)
 
 
 class Reviews(models.Model):
-    text = models.TextField()
+    text = models.TextField(verbose_name='Отзыв',)
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='reviews',
+        verbose_name='Автор',
     )
-    score = models.IntegerField()
-    pub_date = models.DateTimeField(auto_now_add=True)
+    score = models.IntegerField(verbose_name='Оценка',)
+    pub_date = models.DateTimeField(
+        verbose_name='Дата публикации',
+        auto_now_add=True,
+    )
 
     def __str__(self):
         return f'{self.text[:15]} - {self.author} - {self.pub_date}'
 
 
 class Comments(models.Model):
-    text = models.TextField()
+    text = models.TextField(verbose_name='Комментарий')
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='comments',
+        verbose_name='Автор',
     )
-    pub_date = models.DateTimeField(auto_now_add=True)
+    pub_date = models.DateTimeField(
+        verbose_name='Дата публикации',
+        auto_now_add=True
+    )
     review = models.ForeignKey(
         Reviews,
         on_delete=CASCADE,
         related_name='reviews',
+        verbose_name='Отзыв',
     )
 
     def __str__(self):
