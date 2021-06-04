@@ -5,6 +5,7 @@ from . import views
 
 
 router = DefaultRouter()
+router.register('users', views.ApiUserViewSet)
 
 urlpatterns = [
     path('auth/email/', views.SignUpEmail.as_view()),
