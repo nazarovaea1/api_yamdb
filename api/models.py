@@ -9,13 +9,10 @@ User = get_user_model()
 
 
 class Category(models.Model):
-    BOOKS = 'BOOK'
-    MOVIES = 'MOV'
-    MUSIC = 'MSC'
     CATEGORY_CHOICES = [
-        (BOOKS, 'Книги'),
-        (MOVIES, 'Фильмы'),
-        (MUSIC, 'Музыка'),
+        ('Книги', 'Книги'),
+        ('Фильмы', 'Фильмы'),
+        ('Музыка', 'Музыка'),
     ]
     name = models.TextField(verbose_name='Категория',
                             help_text='Выберите категорию',
@@ -34,22 +31,22 @@ class Category(models.Model):
 
 class Genre(models.Model):
     GENRE_CHOICES = [
-        ('book_genres', (
-            ('adventures', 'Приключения'),
-            ('fantasy', 'Фантастика'),
-            ('novel', 'Роман'),
+        ('Книги', (
+            ('Приключения', 'Приключения'),
+            ('Фантастика', 'Фантастика'),
+            ('Роман', 'Роман'),
         )
         ),
-        ('movie_genres', (
-            ('drama', 'Драма'),
-            ('horror', 'Ужасы'),
-            ('adventures', 'Приключения'),
+        ('Фильмы', (
+            ('Драма', 'Драма'),
+            ('Ужасы', 'Ужасы'),
+            ('Военный', 'Военный'),
         )
         ),
-        ('music_genres', (
-            ('classic', 'Классика'),
-            ('rock', 'Рок'),
-            ('jazz', 'Джаз'),
+        ('Музыка', (
+            ('Классика', 'Классика'),
+            ('Рок', 'Рок'),
+            ('Джаз', 'Джаз'),
         )
         ),
     ]
@@ -68,21 +65,7 @@ class Genre(models.Model):
             self.slug = slugify(self.title)[:100]
         super().save(*args, **kwargs)
 
-
-class Title(models.Model):
-    name = models.TextField()
-    description = models.TextField()
-    category = models.ForeignKey(Category, models.SET_NULL, blank=True,
-                                 null=True,
-                                 related_name='title')
-    genre = models.ManyToManyField(Genre, related_name='title')
-    year = models.DecimalField(max_digits=4, decimal_places=0)
-    # rating = models.ForeignKey(Rating, models.SET_NULL, blank=True,
-    #                            null=True,
-    #                            related_name='title')
-
     def __str__(self):
-        # return textwrap.shorten(self.name, self.description, width=15)
         return f'{self.name}, {self.name[:15]}'
 
 
@@ -107,6 +90,22 @@ class Review(models.Model):
 
     def __str__(self):
         return f'{self.text[:15]} - {self.author} - {self.pub_date}'
+
+
+class Title(models.Model):
+    name = models.TextField()
+    description = models.TextField()
+    category = models.ForeignKey(Category, models.SET_NULL, blank=True,
+                                 null=True,
+                                 related_name='title')
+    genre = models.ManyToManyField(Genre, related_name='title')
+    year = models.DecimalField(max_digits=4, decimal_places=0)
+    rating = models.ForeignKey(Review, models.SET_NULL, blank=True,
+                               null=True,
+                               related_name='title')
+
+    def __str__(self):
+        return textwrap.shorten(self.name, width=15)
 
 
 class Comment(models.Model):
