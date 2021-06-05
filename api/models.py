@@ -1,10 +1,11 @@
 import textwrap
 
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models.deletion import CASCADE
 from pytils.translit import slugify
 
-from api_auth.models import User
+User = get_user_model()
 
 
 class Category(models.Model):
@@ -64,46 +65,8 @@ class Genre(models.Model):
             self.slug = slugify(self.title)[:100]
         super().save(*args, **kwargs)
 
-
-class Reviews(models.Model):
-    text = models.TextField(verbose_name='Отзыв',)
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='reviews',
-        verbose_name='Автор',
-    )
-    score = models.IntegerField(verbose_name='Оценка',)
-    pub_date = models.DateTimeField(
-        verbose_name='Дата публикации',
-        auto_now_add=True,
-    )
-
     def __str__(self):
-        return f'{self.text[:15]} - {self.author} - {self.pub_date}'
-
-
-class Comments(models.Model):
-    text = models.TextField(verbose_name='Комментарий')
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='comments',
-        verbose_name='Автор',
-    )
-    pub_date = models.DateTimeField(
-        verbose_name='Дата публикации',
-        auto_now_add=True
-    )
-    review = models.ForeignKey(
-        Reviews,
-        on_delete=CASCADE,
-        related_name='reviews',
-        verbose_name='Отзыв',
-    )
-
-    def __str__(self):
-        return f'{self.text[:15]} - {self.author} - {self.pub_date}'
+        return f'{self.name}, {self.name[:15]}'
 
 
 class Title(models.Model):
@@ -119,3 +82,49 @@ class Title(models.Model):
 
     def __str__(self):
         return textwrap.shorten(self.name, width=15)
+
+
+class Review(models.Model):
+    text = models.TextField(verbose_name='Отзыв',)
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+        verbose_name='Автор',
+    )
+    score = models.IntegerField(verbose_name='Оценка',)
+    pub_date = models.DateTimeField(
+        verbose_name='Дата публикации',
+        auto_now_add=True,
+    )
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+        verbose_name='Произведения')
+
+    def __str__(self):
+        return f'{self.text[:15]} - {self.author} - {self.pub_date}'
+
+
+class Comment(models.Model):
+    text = models.TextField(verbose_name='Комментарий')
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name='Автор',
+    )
+    pub_date = models.DateTimeField(
+        verbose_name='Дата публикации',
+        auto_now_add=True
+    )
+    review = models.ForeignKey(
+        Review,
+        on_delete=CASCADE,
+        related_name='comments',
+        verbose_name='Отзывы',
+    )
+
+    def __str__(self):
+        return f'{self.text[:15]} - {self.author} - {self.pub_date}'
