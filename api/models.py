@@ -65,9 +65,6 @@ class Genre(models.Model):
         super().save(*args, **kwargs)
 
 
-
-
-
 class Reviews(models.Model):
     text = models.TextField(verbose_name='Отзыв',)
     author = models.ForeignKey(
@@ -110,16 +107,15 @@ class Comments(models.Model):
 
 
 class Title(models.Model):
-    name = models.TextField()
-    description = models.TextField()
-    category = models.ForeignKey(Category, models.SET_NULL, blank=True,
+    name = models.TextField(max_length=200)
+    description = models.TextField(blank=True,
+                                   null=True,)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL,
+                                 blank=True,
                                  null=True,
-                                 related_name='title')
-    genre = models.ManyToManyField(Genre, related_name='title')
+                                 related_name='title',)
+    genre = models.ManyToManyField(Genre, related_name='title', blank=True,)
     year = models.DecimalField(max_digits=4, decimal_places=0)
-    rating = models.ForeignKey(Reviews, models.SET_NULL, blank=True,
-                               null=True,
-                               related_name='title')
 
     def __str__(self):
         return textwrap.shorten(self.name, width=15)
