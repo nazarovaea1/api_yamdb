@@ -30,6 +30,11 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ('id', 'text', 'author', 'score', 'pub_date')
         model = Review
 
+    def validate_score(self, value):
+        if value < 1 and value > 10:
+            raise serializers.ValidationError('ERROR: score is fail')
+        return value
+
 
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')
