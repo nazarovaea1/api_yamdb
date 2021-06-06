@@ -1,25 +1,29 @@
-# from django.shortcuts import render
-# from django_filters.rest_framework import DjangoFilterBackend
+from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
-from rest_framework.generics import get_object_or_404
 
+from .filters import TitleFilter
 from .models import Category, Genre, Review, Title
 from .permissions import IsAdminUserOrReadOnly
 from .serializers import (
     CategorySerializer, CommentSerializer, GenreSerializer, ReviewSerializer,
-    TitleSerializer,
+    TitleModifySerializer, TitleReadSerializer,
 )
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
-    serializer_class = TitleSerializer
     permission_classes = (IsAdminUserOrReadOnly,)
-    # filter_backends = (DjangoFilterBackend,)
-    # filterset_fields = ('group',)
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = TitleFilter
+
+    def get_serializer_class(self):
+        if self.action == ('create' or 'partial_update'):
+            return TitleModifySerializer
+        return TitleReadSerializer
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        serializer.save()
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -27,7 +31,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     permission_classes = (IsAdminUserOrReadOnly,)
     filter_backends = [filters.SearchFilter]
-    search_fields = ['name']
+    search_fields = ['name',]
 
     def perform_create(self, serializer):
         serializer.save()
@@ -37,6 +41,8 @@ class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (IsAdminUserOrReadOnly,)
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name',]
 
     def perform_create(self, serializer):
         serializer.save()
