@@ -69,6 +69,21 @@ class Genre(models.Model):
         return f'{self.name}, {self.name[:15]}'
 
 
+class Title(models.Model):
+    name = models.TextField(max_length=200)
+    description = models.TextField(blank=True,
+                                   null=True,)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL,
+                                 blank=True,
+                                 null=True,
+                                 related_name='title',)
+    genre = models.ManyToManyField(Genre, related_name='title', blank=True,)
+    year = models.DecimalField(max_digits=4, decimal_places=0)
+
+    def __str__(self):
+        return textwrap.shorten(self.name, width=15)
+
+
 class Review(models.Model):
     text = models.TextField(verbose_name='Отзыв',)
     author = models.ForeignKey(
@@ -90,22 +105,6 @@ class Review(models.Model):
 
     def __str__(self):
         return f'{self.text[:15]} - {self.author} - {self.pub_date}'
-
-
-class Title(models.Model):
-    name = models.TextField()
-    description = models.TextField()
-    category = models.ForeignKey(Category, models.SET_NULL, blank=True,
-                                 null=True,
-                                 related_name='title')
-    genre = models.ManyToManyField(Genre, related_name='title')
-    year = models.DecimalField(max_digits=4, decimal_places=0)
-    rating = models.ForeignKey(Review, models.SET_NULL, blank=True,
-                               null=True,
-                               related_name='title')
-
-    def __str__(self):
-        return textwrap.shorten(self.name, width=15)
 
 
 class Comment(models.Model):
