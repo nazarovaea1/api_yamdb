@@ -40,7 +40,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     permission_classes = (IsAdminUserOrReadOnly,)
     filter_backends = [filters.SearchFilter]
-    search_fields = ['name',]
+    search_fields = ['name', ]
 
     def perform_create(self, serializer):
         serializer.save()
@@ -51,7 +51,7 @@ class GenreViewSet(viewsets.ModelViewSet):
     serializer_class = GenreSerializer
     permission_classes = (IsAdminUserOrReadOnly,)
     filter_backends = [filters.SearchFilter]
-    search_fields = ['name',]
+    search_fields = ['name', ]
 
     def perform_create(self, serializer):
         serializer.save()

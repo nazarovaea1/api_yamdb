@@ -1,6 +1,4 @@
-from django.db.models import Avg
 from rest_framework import serializers
-from rest_framework.fields import IntegerField
 
 from .models import Category, Comment, Genre, Review, Title
 
@@ -23,6 +21,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('id', 'text', 'author', 'score', 'pub_date')
         model = Review
+
 
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')
