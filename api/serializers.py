@@ -1,5 +1,6 @@
 from django.db.models import Avg
 from rest_framework import serializers
+from rest_framework.fields import IntegerField
 
 from .models import Category, Comment, Genre, Review, Title
 
@@ -23,12 +24,6 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ('id', 'text', 'author', 'score', 'pub_date')
         model = Review
 
-    def validate_score(self, value):
-        if value < 1 and value > 10:
-            raise serializers.ValidationError('ERROR: score is fail')
-        return value
-
-
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')
 
@@ -40,15 +35,16 @@ class CommentSerializer(serializers.ModelSerializer):
 class TitleReadSerializer(serializers.ModelSerializer):
     genre = GenreSerializer(many=True, read_only=True)
     category = CategorySerializer(many=False, read_only=True)
+    rating = serializers.FloatField()
     # rating = serializers.SlugRelatedField(
     #     slug_field='slug',
-    #     queryset=Reviews.objects.all().aggregate(Avg('score')))
-    rating = serializers.SerializerMethodField()
+    #     queryset=Review.objects.all().aggregate(Avg('score')))
+    # rating = serializers.SerializerMethodField()
 
-    def get_rating(self, obj):
-        if obj.reviews.exists():
-            return obj.reviews.aggregate(rating=Avg('score').get('rating'))
-        return None
+    # def get_rating(self, obj):
+    #     if obj.reviews.exists():
+    #         return obj.reviews.aggregate(rating=Avg('score').get('rating'))
+    #     return None
 
     class Meta:
         fields = ('__all__')

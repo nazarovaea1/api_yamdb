@@ -151,3 +151,4 @@ media/
 setup.cfg
 
 sent_emails/
+migrations/
