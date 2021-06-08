@@ -5,6 +5,8 @@ from django.db import models
 from django.db.models.deletion import CASCADE
 from pytils.translit import slugify
 
+from .validators import validate_year
+
 User = get_user_model()
 
 
@@ -50,7 +52,8 @@ class Title(models.Model):
                                  null=True,
                                  related_name='title',)
     genre = models.ManyToManyField(Genre, related_name='title', blank=True,)
-    year = models.DecimalField(max_digits=4, decimal_places=0)
+    year = models.IntegerField(blank=True, null=True,
+                               validators=[validate_year])
 
     def __str__(self):
         return textwrap.shorten(self.name, width=15)

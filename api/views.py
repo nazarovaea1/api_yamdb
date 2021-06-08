@@ -3,11 +3,10 @@ from django.db.models import Avg
 from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, status, viewsets
+from rest_framework import filters, viewsets
 from rest_framework.mixins import (
     CreateModelMixin, DestroyModelMixin, ListModelMixin,
 )
-from rest_framework.response import Response
 
 from .filters import TitleFilter
 from .models import Category, Genre, Review, Title
@@ -20,15 +19,16 @@ from .serializers import (
 User = get_user_model()
 
 
-class CustomViewSet(viewsets.GenericViewSet, ListModelMixin, CreateModelMixin, 
+class CustomViewSet(viewsets.GenericViewSet, ListModelMixin, CreateModelMixin,
                     DestroyModelMixin,):
     pass
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAdminUserOrReadOnly, IsOwnerOrReadOnly, )
+    permission_classes = (IsAdminUserOrReadOnly,)
     filter_backends = [DjangoFilterBackend]
     filterset_class = TitleFilter
+    queryset = Title.objects.all()
 
     def get_queryset(self):
         return Title.objects.annotate(
@@ -36,7 +36,7 @@ class TitleViewSet(viewsets.ModelViewSet):
         )
 
     def get_serializer_class(self):
-        if self.action == ('create' or 'partial_update'):
+        if self.action in ['create', 'partial_update']:
             return TitleModifySerializer
         return TitleReadSerializer
 
