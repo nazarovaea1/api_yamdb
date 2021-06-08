@@ -65,8 +65,8 @@ class Genre(models.Model):
             self.slug = slugify(self.title)[:100]
         super().save(*args, **kwargs)
 
-    def __str__(self):
-        return f'{self.name}, {self.name[:15]}'
+    # def __str__(self):
+    #     return f'{self.name}, {self.name[:15]}'
 
 
 class Title(models.Model):
