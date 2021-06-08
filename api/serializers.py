@@ -42,7 +42,7 @@ class TitleReadSerializer(serializers.ModelSerializer):
 
     def get_rating(self, obj):
         if obj.reviews.exists():
-            return obj.reviews.aggregate(rating=Avg('score').get('rating'))
+            return obj.reviews.aggregate(rating=Avg('score'))
         return None
 
     class Meta:

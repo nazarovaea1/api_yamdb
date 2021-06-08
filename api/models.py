@@ -9,14 +9,8 @@ User = get_user_model()
 
 
 class Category(models.Model):
-    CATEGORY_CHOICES = [
-        ('Книги', 'Книги'),
-        ('Фильмы', 'Фильмы'),
-        ('Музыка', 'Музыка'),
-    ]
     name = models.TextField(verbose_name='Категория',
-                            help_text='Выберите категорию',
-                            choices=CATEGORY_CHOICES,)
+                            help_text='Выберите категорию',)
     slug = models.SlugField(max_length=100,
                             unique=True, blank=True,)
 
@@ -30,30 +24,8 @@ class Category(models.Model):
 
 
 class Genre(models.Model):
-    GENRE_CHOICES = [
-        ('Книги', (
-            ('Приключения', 'Приключения'),
-            ('Фантастика', 'Фантастика'),
-            ('Роман', 'Роман'),
-        )
-        ),
-        ('Фильмы', (
-            ('Драма', 'Драма'),
-            ('Ужасы', 'Ужасы'),
-            ('Военный', 'Военный'),
-        )
-        ),
-        ('Музыка', (
-            ('Классика', 'Классика'),
-            ('Рок', 'Рок'),
-            ('Джаз', 'Джаз'),
-        )
-        ),
-    ]
-
     name = models.TextField(verbose_name='Жанр',
-                            help_text='Выберите жанр',
-                            choices=GENRE_CHOICES,)
+                            help_text='Выберите жанр',)
     slug = models.SlugField(max_length=100,
                             unique=True, blank=True,)
 
