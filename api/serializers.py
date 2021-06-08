@@ -3,6 +3,8 @@ from rest_framework import serializers
 
 from .models import Category, Comment, Genre, Review, Title
 
+# from rest_framework.validators import UniqueTogetherValidator
+
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -22,10 +24,18 @@ class GenreSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')
+    # title = serializers.HiddenField()
 
     class Meta:
+        # fields = ('id', 'text', 'author', 'title', 'score', 'pub_date')
         fields = ('id', 'text', 'author', 'score', 'pub_date')
         model = Review
+        # validators = (
+        #     UniqueTogetherValidator(
+        #         queryset=Review.objects.all(),
+        #         fields=('author', 'title')
+        #     ),
+        # )
 
 
 class CommentSerializer(serializers.ModelSerializer):

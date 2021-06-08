@@ -69,8 +69,7 @@ class Review(models.Model):
     )
     score = models.IntegerField(
         verbose_name='Оценка',
-        choices=[(i, i) for i in range(1, 11)],
-        unique=True
+        choices=[(i, i) for i in range(1, 11)]
     )
     pub_date = models.DateTimeField(
         verbose_name='Дата публикации',
@@ -84,6 +83,9 @@ class Review(models.Model):
 
     def __str__(self):
         return f'{self.text[:15]} - {self.author} - {self.pub_date}'
+
+    class Meta:
+        unique_together = ('author', 'title',)
 
 
 class Comment(models.Model):
