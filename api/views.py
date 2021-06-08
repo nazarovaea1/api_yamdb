@@ -3,7 +3,11 @@ from django.db.models import Avg
 from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, viewsets
+from rest_framework import filters, status, viewsets
+from rest_framework.mixins import (
+    CreateModelMixin, DestroyModelMixin, ListModelMixin,
+)
+from rest_framework.response import Response
 
 from .filters import TitleFilter
 from .models import Category, Genre, Review, Title
@@ -14,6 +18,11 @@ from .serializers import (
 )
 
 User = get_user_model()
+
+
+class CustomViewSet(viewsets.GenericViewSet, ListModelMixin, CreateModelMixin, 
+                    DestroyModelMixin,):
+    pass
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -35,10 +44,11 @@ class TitleViewSet(viewsets.ModelViewSet):
         serializer.save()
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(CustomViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (IsAdminUserOrReadOnly, )
+    lookup_field = 'slug'
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', ]
 
@@ -46,10 +56,11 @@ class CategoryViewSet(viewsets.ModelViewSet):
         serializer.save()
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(CustomViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (IsAdminUserOrReadOnly,)
+    lookup_field = 'slug'
     filter_backends = [filters.SearchFilter]
     search_fields = ['name', ]
 
