@@ -19,7 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
         """
         Check if user's role is in ROLE_CHOICES
         """
-        if value not in ['admin', 'moderator', 'user']:
+        if value not in settings.USER_ROLES:
             raise ValidationError(
                 "Only 'user' or 'moderator' or 'admin' roles are allowed"
             )
@@ -27,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = User.objects.create_user(
-            username=validated_data.get('userrname'),
+            username=validated_data.get('username'),
             email=validated_data.get('email'),
             first_name=validated_data.get('first_name', ''),
             last_name=validated_data.get('last_name', ''),
@@ -38,9 +38,10 @@ class UserSerializer(serializers.ModelSerializer):
         if validated_data.get('role') == 'admin':
             user.is_staff = True
             user.is_superuser = True
-        else:
-            user.is_staff = False
-            user.is_superuser = False
+
+        user.is_staff = False
+        user.is_superuser = False
+
         user.save()
 
         return user

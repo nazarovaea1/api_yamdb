@@ -123,3 +123,5 @@ SIMPLE_JWT = {
 }
 
 AUTH_USER_MODEL = 'api_auth.User'
+
+USER_ROLES = ('user', 'moderator', 'admin')
