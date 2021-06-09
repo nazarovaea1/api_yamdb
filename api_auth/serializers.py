@@ -47,7 +47,9 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'bio', 'role',]
+        fields = [
+            'first_name', 'last_name', 'username', 'email', 'bio', 'role',
+        ]
 
 
 class SignUpSerializer(serializers.ModelSerializer):
@@ -58,9 +60,13 @@ class SignUpSerializer(serializers.ModelSerializer):
         """ Checking the uniqueness of email """
 
         username = self.initial_data.get('username')
+        email_exists = User.objects.filter(
+            username=username,
+            email=value
+        ).exists()
 
         if User.objects.filter(email=value).exists():
-            if not User.objects.filter(username=username, email=value).exists():
+            if not email_exists:
                 raise ValidationError('This email already exists')
 
         return value

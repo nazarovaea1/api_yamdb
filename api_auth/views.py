@@ -22,7 +22,8 @@ class MyTokenObtainPairView(APIView):
         if serializer.is_valid():
             username = serializer.data.get('username')
             email = serializer.data.get('email')
-            user, created = User.objects.get_or_create(username=username, email=email)
+            user, created = User.objects.get_or_create(
+                username=username, email=email)
             data = self.get_tokens_for_user(user)
 
             return Response(data, status=status.HTTP_200_OK)

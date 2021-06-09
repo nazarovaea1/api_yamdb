@@ -29,12 +29,12 @@ class TitleViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminUserOrReadOnly,)
     filter_backends = [DjangoFilterBackend]
     filterset_class = TitleFilter
-    queryset = Title.objects.all()
+    # queryset = Title.objects.all()
 
     def get_queryset(self):
         return Title.objects.annotate(
             rating=Coalesce(Avg('reviews__score'), None)
-        )
+        ).order_by('name')
 
     def get_serializer_class(self):
         if self.action in ['create', 'partial_update']:
