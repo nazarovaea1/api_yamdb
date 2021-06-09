@@ -90,5 +90,3 @@ class MyTokenSerializer(serializers.Serializer):
             raise ValidationError('The confirmation code is not correct')
 
         return value
-        
-

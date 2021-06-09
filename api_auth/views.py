@@ -20,7 +20,9 @@ logging.basicConfig(
     filename='mail.log',
     filemode='a',
     format='%(asctime)s, %(levelname)s, %(message)s, %(name)s'
-) 
+)
+
+
 class MyTokenObtainPairView(APIView):
     permission_classes = (AllowAny,)
 
@@ -102,7 +104,7 @@ class UserProfile(APIView):
         return Response(serializer.data)
 
     def patch(self, request, format=None):
-        # Do not allow to change username, email and role in profile
+        """ Do not allow to change username, email and role in profile """
         for item in request.data.keys():
             if item in self.USER_ATTR:
                 raise ValidationError(
@@ -145,21 +147,19 @@ class SignUpEmail(APIView):
             password=password, salt=settings.SECRET_KEY, hasher='default'
         ).split('$')[-1]
 
-        try: 
-            send_mail(
-            'Sign up new user',
-            f'Your confirmation code: {confirmation_code}',
-            'noreply@yatube.ru',
-            [email],
-            fail_silently=False,
-        )
+        try:
+            send_mail('Sign up new user',
+                      f'Your confirmation code: {confirmation_code}',
+                      'noreply@yatube.ru',
+                      [email],
+                      fail_silently=False,)
         except SMTPException as e:
             logging.error(e, exc_info=True)
             return Response(
-                {'info': 'There was an error sending an email: '+ e},
+                {'info': 'There was an error sending an email: ' + e},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        except:
+        except Exception:
             logging.exception()
             return Response(
                 {'info': 'Mail Sending Failed'},
