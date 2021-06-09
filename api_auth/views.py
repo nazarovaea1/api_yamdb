@@ -8,27 +8,36 @@ from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from smtplib import SMTPException
+import logging
 
 from .models import User
 from .serializers import MyTokenSerializer, SignUpSerializer, UserSerializer
 
-
+logging.basicConfig(
+    filename='mail.log',
+    filemode='a',
+    format='%(asctime)s, %(levelname)s, %(message)s, %(name)s'
+) 
 class MyTokenObtainPairView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = MyTokenSerializer(data=request.data)
 
-        if serializer.is_valid():
-            username = serializer.data.get('username')
-            email = serializer.data.get('email')
-            user, created = User.objects.get_or_create(
-                username=username, email=email)
-            data = self.get_tokens_for_user(user)
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-            return Response(data, status=status.HTTP_200_OK)
+        username = serializer.data.get('username')
+        email = serializer.data.get('email')
+        user, created = User.objects.get_or_create(
+            username=username, email=email)
+        data = self.get_tokens_for_user(user)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(data, status=status.HTTP_200_OK)
 
     def get_tokens_for_user(self, user):
         refresh = RefreshToken.for_user(user)
@@ -36,7 +45,6 @@ class MyTokenObtainPairView(APIView):
 
 
 class CustomPagination(PageNumberPagination):
-    page_size = 10
     page_size_query_param = 'page_size'
 
 
@@ -57,13 +65,12 @@ class ApiUserViewSet(viewsets.ModelViewSet):
         role = request.data.get('role', None)
 
         if role is not None:
-            # create user or admin depending on role
+            user.is_staff = False
+            user.is_superuser = False
+
             if role == 'admin':
                 user.is_staff = True
                 user.is_superuser = True
-            else:
-                user.is_staff = False
-                user.is_superuser = False
 
             user.save()
 
@@ -73,7 +80,10 @@ class ApiUserViewSet(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 class UserProfile(APIView):
@@ -82,6 +92,7 @@ class UserProfile(APIView):
     """
 
     permission_classes = (IsAuthenticated,)
+    USER_ATTR = ('username', 'email', 'role')
 
     def get(self, request, format=None):
         user = self.request.user
@@ -91,9 +102,9 @@ class UserProfile(APIView):
     def patch(self, request, format=None):
         # Do not allow to change username, email and role in profile
         for item in request.data.keys():
-            if item in ['username', 'email', 'role']:
+            if item in self.USER_ATTR:
                 raise ValidationError(
-                    "Changing username, email and role is not permitted"
+                    'Changing username, email and role is not permitted'
                 )
         user = self.request.user
         serializer = UserSerializer(user, data=request.data, partial=True)
@@ -111,27 +122,44 @@ class SignUpEmail(APIView):
     def post(self, request):
         serializer = SignUpSerializer(data=request.data)
 
-        if serializer.is_valid():
-            email = serializer.data.get('email')
-            username = serializer.data.get('username')
-            self.send_mail(email, username)
-
+        if not serializer.is_valid():
             return Response(
-                {'info': 'Confirmation code was sent to your email'},
-                status=status.HTTP_201_CREATED,
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
             )
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        email = serializer.data.get('email')
+        username = serializer.data.get('username')
+        self.send_mail(email, username)
+
+        return Response(
+            {'info': 'Confirmation code was sent to your email'},
+            status=status.HTTP_201_CREATED
+        )
 
     def send_mail(self, email, username):
         password = email + username
         confirmation_code = make_password(
             password=password, salt=settings.SECRET_KEY, hasher='default'
         ).split('$')[-1]
-        send_mail(
+
+        try: 
+            send_mail(
             'Sign up new user',
             f'Your confirmation code: {confirmation_code}',
             'noreply@yatube.ru',
             [email],
             fail_silently=False,
         )
+        except SMTPException as e:
+            logging.error(e, exc_info=True)
+            return Response(
+                {'info': 'There was an error sending an email. '+ e},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except:
+            logging.exception()
+            return Response(
+                {'info': 'Mail Sending Failed'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
