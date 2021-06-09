@@ -30,6 +30,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminUserOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
+    MODIFYING_METHODS = ('create', 'partial_update',)
 
     def get_queryset(self):
         return Title.objects.annotate(
@@ -37,7 +38,7 @@ class TitleViewSet(viewsets.ModelViewSet):
         )
 
     def get_serializer_class(self):
-        if self.action in ACTIONS:
+        if self.action in self.MODIFYING_METHODS:
             return TitleModifySerializer
         return TitleReadSerializer
 
