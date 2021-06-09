@@ -16,11 +16,11 @@ class Category(models.Model):
     slug = models.SlugField(max_length=100,
                             unique=True, blank=True,)
 
-    def __str__(self):
-        return textwrap.shorten(self.name, width=15)
-
     class Meta:
         ordering = ('name',)
+
+    def __str__(self):
+        return textwrap.shorten(self.name, width=15)
 
     def save(self, *args, **kwargs):
         if not self.slug:
