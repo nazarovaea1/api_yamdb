@@ -29,7 +29,6 @@ class TitleViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminUserOrReadOnly,)
     filter_backends = [DjangoFilterBackend]
     filterset_class = TitleFilter
-    # queryset = Title.objects.all()
 
     def get_queryset(self):
         return Title.objects.annotate(
