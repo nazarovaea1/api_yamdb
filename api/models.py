@@ -19,6 +19,9 @@ class Category(models.Model):
     def __str__(self):
         return textwrap.shorten(self.name, width=15)
 
+    class Meta:
+        ordering = ('name',)
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.title)[:100]
@@ -31,6 +34,9 @@ class Genre(models.Model):
     slug = models.SlugField(max_length=100,
                             unique=True, blank=True,)
 
+    class Meta:
+        ordering = ('name',)
+
     def __str__(self):
         return textwrap.shorten(self.name, width=15)
 
@@ -38,9 +44,6 @@ class Genre(models.Model):
         if not self.slug:
             self.slug = slugify(self.title)[:100]
         super().save(*args, **kwargs)
-
-    # def __str__(self):
-    #     return f'{self.name}, {self.name[:15]}'
 
 
 class Title(models.Model):
@@ -54,6 +57,9 @@ class Title(models.Model):
     genre = models.ManyToManyField(Genre, related_name='title', blank=True,)
     year = models.IntegerField(blank=True, null=True,
                                validators=[validate_year])
+
+    class Meta:
+        ordering = ('name',)
 
     def __str__(self):
         return textwrap.shorten(self.name, width=15)
@@ -69,8 +75,7 @@ class Review(models.Model):
     )
     score = models.IntegerField(
         verbose_name='Оценка',
-        choices=[(i, i) for i in range(1, 11)],
-        unique=True
+        choices=[(i, i) for i in range(1, 11)]
     )
     pub_date = models.DateTimeField(
         verbose_name='Дата публикации',
@@ -81,6 +86,9 @@ class Review(models.Model):
         on_delete=models.CASCADE,
         related_name='reviews',
         verbose_name='Произведения')
+
+    class Meta:
+        ordering = ('-pub_date',)
 
     def __str__(self):
         return f'{self.text[:15]} - {self.author} - {self.pub_date}'
@@ -104,6 +112,9 @@ class Comment(models.Model):
         related_name='comments',
         verbose_name='Отзывы',
     )
+
+    class Meta:
+        ordering = ('-pub_date',)
 
     def __str__(self):
         return f'{self.text[:15]} - {self.author} - {self.pub_date}'

@@ -27,14 +27,14 @@ class UserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = User.objects.create_user(
-            username=validated_data['username'],
-            email=validated_data['email'],
+            username=validated_data.get('userrname'),
+            email=validated_data.get('email'),
             first_name=validated_data.get('first_name', ''),
             last_name=validated_data.get('last_name', ''),
             bio=validated_data.get('bio', ''),
             role=validated_data.get('role', 'user'),
         )
-        # create user or admin depending on role
+
         if validated_data.get('role') == 'admin':
             user.is_staff = True
             user.is_superuser = True
@@ -47,7 +47,9 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'bio', 'role',]
+        fields = [
+            'first_name', 'last_name', 'username', 'email', 'bio', 'role',
+        ]
 
 
 class SignUpSerializer(serializers.ModelSerializer):
@@ -57,10 +59,14 @@ class SignUpSerializer(serializers.ModelSerializer):
     def validate_email(self, value):
         """ Checking the uniqueness of email """
 
-        username = self.initial_data.get('username')
+        is_username = self.initial_data.get('username')
+        is_email_exists = User.objects.filter(
+            username=is_username,
+            email=value
+        ).exists()
 
         if User.objects.filter(email=value).exists():
-            if not User.objects.filter(username=username, email=value).exists():
+            if not is_email_exists:
                 raise ValidationError('This email already exists')
 
         return value
@@ -78,7 +84,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'username']
+        fields = ('email', 'username')
 
 
 class MyTokenSerializer(serializers.Serializer):

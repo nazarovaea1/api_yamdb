@@ -6,10 +6,14 @@ from .models import User
 
 
 class Admin(UserAdmin):
-    list_display = ('username', 'first_name', 'last_name', 'is_staff', 'email', 'role')
+    list_display = (
+        'username', 'first_name', 'last_name', 'is_staff', 'email', 'role',
+    )
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
-        (_('Personal info'), {'fields': ('first_name', 'last_name', 'email', 'bio')}),
+        (_('Personal info'), {
+            'fields': ('first_name', 'last_name', 'email', 'bio')
+        }),
         (
             _('Permissions'),
             {
