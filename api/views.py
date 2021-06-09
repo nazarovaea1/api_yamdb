@@ -18,6 +18,7 @@ from .serializers import (
 )
 
 User = get_user_model()
+ACTIONS = ('create', 'partial_update',)
 
 
 class CustomViewSet(viewsets.GenericViewSet, ListModelMixin, CreateModelMixin,
@@ -27,16 +28,16 @@ class CustomViewSet(viewsets.GenericViewSet, ListModelMixin, CreateModelMixin,
 
 class TitleViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminUserOrReadOnly,)
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
 
     def get_queryset(self):
         return Title.objects.annotate(
             rating=Coalesce(Avg('reviews__score'), None)
-        ).order_by('name')
+        )
 
     def get_serializer_class(self):
-        if self.action in ['create', 'partial_update']:
+        if self.action in ACTIONS:
             return TitleModifySerializer
         return TitleReadSerializer
 
@@ -49,8 +50,8 @@ class CategoryViewSet(CustomViewSet):
     serializer_class = CategorySerializer
     permission_classes = (IsAdminUserOrReadOnly, )
     lookup_field = 'slug'
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['name', ]
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
 
     def perform_create(self, serializer):
         serializer.save()
@@ -61,8 +62,8 @@ class GenreViewSet(CustomViewSet):
     serializer_class = GenreSerializer
     permission_classes = (IsAdminUserOrReadOnly,)
     lookup_field = 'slug'
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['name', ]
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
 
     def perform_create(self, serializer):
         serializer.save()
