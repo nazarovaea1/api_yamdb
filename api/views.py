@@ -29,7 +29,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminUserOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
-    MODIFYING_METHODS = ['create', 'partial_update']
+    MODIFYING_METHODS = ('create', 'partial_update',)
 
     def get_queryset(self):
         return Title.objects.annotate(
@@ -51,7 +51,7 @@ class CategoryViewSet(CustomViewSet):
     permission_classes = (IsAdminUserOrReadOnly, )
     lookup_field = 'slug'
     filter_backends = (filters.SearchFilter,)
-    search_fields = ['name', ]
+    search_fields = ('name', )
 
     def perform_create(self, serializer):
         serializer.save()
@@ -63,7 +63,7 @@ class GenreViewSet(CustomViewSet):
     permission_classes = (IsAdminUserOrReadOnly,)
     lookup_field = 'slug'
     filter_backends = (filters.SearchFilter,)
-    search_fields = ['name', ]
+    search_fields = ('name', )
 
     def perform_create(self, serializer):
         serializer.save()
