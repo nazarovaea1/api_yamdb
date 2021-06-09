@@ -156,7 +156,7 @@ class SignUpEmail(APIView):
         except SMTPException as e:
             logging.error(e, exc_info=True)
             return Response(
-                {'info': 'There was an error sending an email. '+ e},
+                {'info': 'There was an error sending an email: '+ e},
                 status=status.HTTP_400_BAD_REQUEST
             )
         except:

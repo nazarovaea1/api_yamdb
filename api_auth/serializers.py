@@ -54,34 +54,12 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class SignUpSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField()
-    username = serializers.CharField()
-
-    def validate_email(self, value):
-        """ Checking the uniqueness of email """
-
-        is_username = self.initial_data.get('username')
-        is_email_exists = User.objects.filter(
-            username=is_username,
-            email=value
-        ).exists()
-
-        if User.objects.filter(email=value).exists():
-            if not is_email_exists:
-                raise ValidationError('This email already exists')
-
-        return value
-
-    def validate_username(self, value):
-        """ Checking the uniqueness of username """
-
-        email = self.initial_data.get('email')
-
-        if User.objects.filter(username=value).exists():
-            if not User.objects.filter(username=value, email=email).exists():
-                raise ValidationError('This username already exists')
-
-        return value
+    email = serializers.EmailField(
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )
+    username = serializers.CharField(
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )
 
     class Meta:
         model = User
@@ -97,17 +75,20 @@ class MyTokenSerializer(serializers.Serializer):
         """
         Check confirmation code returned from user
         """
-        # confirmation code generation using user's email and username
         email = self.initial_data.get('email', '')
         username = self.initial_data.get('username', '')
 
-        if email and username:
-            password = email + username
-            response_code = make_password(
-                password=password, salt=settings.SECRET_KEY, hasher='default'
-            ).split('$')[-1]
+        if not email or not username:
+            raise ValidationError('The email or the username is not correct')
 
-            if response_code != value:
-                raise ValidationError('The confirmation code is not correct')
+        password = email + username
+        response_code = make_password(
+            password=password, salt=settings.SECRET_KEY, hasher='default'
+        ).split('$')[-1]
 
-            return value
+        if response_code != value:
+            raise ValidationError('The confirmation code is not correct')
+
+        return value
+        
+
