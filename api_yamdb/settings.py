@@ -104,16 +104,6 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.ScopedRateThrottle',
-    ],
-    'DEFAULT_THROTTLE_RATES': {
-        'user': '10000/day',
-        'anon': '1000/day',
-        'low_request': '10/minute',
-        'mid_request': '30/minute',
-        'high_request': '50/minute',
-    },
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
 }
@@ -125,3 +115,6 @@ SIMPLE_JWT = {
 AUTH_USER_MODEL = 'api_auth.User'
 
 USER_ROLES = ('user', 'moderator', 'admin')
+USER = USER_ROLES[0]
+MODERATOR = USER_ROLES[1]
+ADMIN = USER_ROLES[2]

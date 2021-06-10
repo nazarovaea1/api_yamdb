@@ -1,7 +1,7 @@
 from rest_framework import permissions
 from rest_framework.permissions import IsAdminUser
 
-MODERATOR = 'moderator'
+from api_yamdb.settings import MODERATOR
 
 
 class IsAdminUserOrReadOnly(IsAdminUser):

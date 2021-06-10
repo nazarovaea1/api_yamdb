@@ -68,11 +68,15 @@ class ApiUserViewSet(viewsets.ModelViewSet):
         user = User.objects.get(username=username)
         role = request.data.get('role', None)
 
+        @property
+        def is_admin(self):
+            return self.role == settings.ADMIN
+
         if role is not None:
             user.is_staff = False
             user.is_superuser = False
 
-            if role == 'admin':
+            if is_admin:
                 user.is_staff = True
                 user.is_superuser = True
 

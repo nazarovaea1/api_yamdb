@@ -18,7 +18,6 @@ from .serializers import (
 )
 
 User = get_user_model()
-ACTIONS = ('create', 'partial_update',)
 
 
 class CustomViewSet(viewsets.GenericViewSet, ListModelMixin, CreateModelMixin,
@@ -30,6 +29,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminUserOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
+
     MODIFYING_METHODS = ('create', 'partial_update',)
 
     def get_queryset(self):
