@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import User
+from .models import ADMIN, User
 from .serializers import MyTokenSerializer, SignUpSerializer, UserSerializer
 
 logging.basicConfig(
@@ -70,7 +70,7 @@ class ApiUserViewSet(viewsets.ModelViewSet):
 
         @property
         def is_admin(self):
-            return self.role == settings.ADMIN
+            return self.role == ADMIN
 
         if role is not None:
             user.is_staff = False

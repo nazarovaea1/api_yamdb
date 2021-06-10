@@ -2,7 +2,10 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-import api_yamdb.settings as settings
+USER_ROLES = ('user', 'moderator', 'admin')
+USER = USER_ROLES[0]
+MODERATOR = USER_ROLES[1]
+ADMIN = USER_ROLES[2]
 
 
 class User(AbstractUser):
@@ -15,8 +18,8 @@ class User(AbstractUser):
     )
     role = models.CharField(
         max_length=10,
-        choices=settings.USER_ROLES,
-        default=settings.USER
+        choices=USER_ROLES,
+        default=USER
     )
     email = models.EmailField(_('email address'))
 

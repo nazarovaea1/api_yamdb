@@ -4,7 +4,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueValidator
 
-from .models import User
+from .models import ADMIN, USER_ROLES, User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -19,7 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
         """
         Check if user's role is in ROLE_CHOICES
         """
-        if value not in settings.USER_ROLES:
+        if value not in USER_ROLES:
             raise ValidationError(
                 "Only 'user' or 'moderator' or 'admin' roles are allowed"
             )
@@ -37,7 +37,7 @@ class UserSerializer(serializers.ModelSerializer):
 
         @property
         def is_admin(self):
-            return validated_data.get('role') == settings.ADMIN
+            return validated_data.get('role') == ADMIN
 
         if is_admin:
             user.is_staff = True
