@@ -35,16 +35,16 @@ class UserSerializer(serializers.ModelSerializer):
             role=validated_data.get('role', 'user'),
         )
 
-        @property
-        def is_admin(self):
-            return validated_data.get('role') == ADMIN
+        # @property
+        # def is_admin(self):
+        #     return validated_data.get('role') == ADMIN
 
-        if is_admin:
+        if user.is_admin:
             user.is_staff = True
             user.is_superuser = True
 
-        user.is_staff = False
-        user.is_superuser = False
+        # user.is_staff = False
+        # user.is_superuser = False
 
         user.save()
 
