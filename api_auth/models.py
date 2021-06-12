@@ -2,10 +2,10 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-USER_ROLES = ('user', 'moderator', 'admin')
-USER = USER_ROLES[0]
-MODERATOR = USER_ROLES[1]
-ADMIN = USER_ROLES[2]
+USER = 'user'
+MODERATOR = 'moderator'
+ADMIN = 'admin'
+USER_ROLES = (USER, MODERATOR, ADMIN)
 
 
 class User(AbstractUser):
@@ -26,9 +26,13 @@ class User(AbstractUser):
     class Meta:
         ordering = ('username',)
 
-    def __str__(self):
-        return self.email
-
     @property
     def is_admin(self):
         return self.role == ADMIN
+
+    @property
+    def is_moderator(self):
+        return self.role == MODERATOR
+
+    def __str__(self):
+        return self.email

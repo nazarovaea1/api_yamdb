@@ -4,12 +4,12 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueValidator
 
-from .models import ADMIN, USER_ROLES, User
+from .models import USER_ROLES, User
 
 
 class UserSerializer(serializers.ModelSerializer):
     bio = serializers.CharField(required=False)
-    role = serializers.CharField(required=False)
+    role = serializers.CharField(required=True)
     email = serializers.EmailField(
         required=True,
         validators=[UniqueValidator(queryset=User.objects.all())]
@@ -35,16 +35,9 @@ class UserSerializer(serializers.ModelSerializer):
             role=validated_data.get('role', 'user'),
         )
 
-        # @property
-        # def is_admin(self):
-        #     return validated_data.get('role') == ADMIN
-
         if user.is_admin:
             user.is_staff = True
             user.is_superuser = True
-
-        # user.is_staff = False
-        # user.is_superuser = False
 
         user.save()
 
@@ -52,9 +45,9 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = [
+        fields = (
             'first_name', 'last_name', 'username', 'email', 'bio', 'role',
-        ]
+        )
 
 
 class SignUpSerializer(serializers.ModelSerializer):

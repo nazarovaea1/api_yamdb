@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import ADMIN, User
+from .models import User
 from .serializers import MyTokenSerializer, SignUpSerializer, UserSerializer
 
 logging.basicConfig(
@@ -66,19 +66,10 @@ class ApiUserViewSet(viewsets.ModelViewSet):
 
     def partial_update(self, request, username):
         user = User.objects.get(username=username)
-        role = request.data.get('role', None)
 
-        @property
-        def is_admin(self):
-            return self.role == ADMIN
-
-        if role is not None:
-            user.is_staff = False
-            user.is_superuser = False
-
-            if is_admin:
-                user.is_staff = True
-                user.is_superuser = True
+        if not user.is_admin:
+            user.is_staff = True
+            user.is_superuser = True
 
             user.save()
 
